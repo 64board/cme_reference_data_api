@@ -68,7 +68,7 @@ def main():
 
                 if date != None: 
                     print('Updating {} with {} ...'.format(i['symbol_mbf']+i['contract'], date))
-                    #db.execute('update prices set expires = %s where symbol = %s and contract = %s', (date, i['symbol_mbf'], i['contract']))
+                    db.execute('UPDATE prices SET expires = %s WHERE symbol = %s AND contract = %s', (date, i['symbol_mbf'], i['contract']))
                 else:
                     print('No expiration date found for {} ...'.format(i['symbol_mbf']+i['contract'], date))
 
