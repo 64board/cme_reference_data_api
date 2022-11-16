@@ -15,7 +15,7 @@ def main():
     Updates database prices table first notice date field for CME instruments,
     using CME Reference Data API to obtain first notice dates.
     janeiros@mbfcc.com, 2022-11-09
-    Modified SQL query to use new field is_physical in cme_symbols table. Only
+    Modified SQL query to use new field has_fnotice in cme_symbols table. Only
     physical symbols have First Notice Date data.
     janeiros@mbfcc.com, 2022-11-16
     """
