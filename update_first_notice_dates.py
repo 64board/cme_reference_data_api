@@ -14,8 +14,10 @@ def main():
     """
     Updates database prices table first notice date field for CME instruments,
     using CME Reference Data API to obtain first notice dates.
-    janeiros@mbfcc.com
-    2022-11-09
+    janeiros@mbfcc.com, 2022-11-09
+    Modified SQL query to use new filed is_physical in cme_symbols table. Only
+    physical symbols have First Notice Date data.
+    janeiros@mbfcc.com, 2022-11-16
     """
 
     # Create config file parser.
@@ -42,8 +44,7 @@ def main():
             SELECT s.mbf_symbol, s.mdp3_symbol, p.contract, p.fnotice
             FROM pltracker.cme_symbols AS s
             INNER JOIN pltracker.prices AS p ON s.mbf_symbol = p.symbol
-            WHERE p.fnotice IS NULL AND s.mdp3_symbol IS NOT NULL AND s.is_option = 0
-            AND s.mbf_symbol NOT IN (SELECT symbol FROM pltracker.instruments WHERE description RLIKE ' TAS\$');
+            WHERE p.fnotice IS NULL AND s.mdp3_symbol IS NOT NULL AND s.is_physical = 1;
             """
 
             prices = db.query(sql)
