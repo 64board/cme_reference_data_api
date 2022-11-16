@@ -44,7 +44,7 @@ def main():
             SELECT s.mbf_symbol, s.mdp3_symbol, p.contract, p.fnotice
             FROM pltracker.cme_symbols AS s
             INNER JOIN pltracker.prices AS p ON s.mbf_symbol = p.symbol
-            WHERE p.fnotice IS NULL AND s.mdp3_symbol IS NOT NULL AND s.is_physical = 1;
+            WHERE p.fnotice IS NULL AND s.mdp3_symbol IS NOT NULL AND s.has_fnotice = 1;
             """
 
             prices = db.query(sql)
