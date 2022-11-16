@@ -42,16 +42,16 @@ class RefData:
         except ValueError as e:
             raise RefDataError('RefData: Error decoding JSON.', e)
 
-    def find_expire_date(self, instrument):
+    def find_expire_date(self, symbol, contract):
         """
         Returns a date string for a given instrument, if the instrument
         doesn't exist returns None.
         """
-        cme_instrument = CMEHelper.convert_to_cme_instrument(instrument)
-        
+        cme_instrument = CMEHelper.convert_to_cme_instrument(symbol, contract)
+
         query = '{}/v2/instruments?globexSymbol={}'.format(self._url_query, cme_instrument)
-    
-        auth_header = {'Authorization' :  'Bearer {}'.format(self._access_token)}
+
+        auth_header = {'Authorization' : 'Bearer {}'.format(self._access_token)}
 
         r = requests.get(query, headers=auth_header)
 
@@ -63,15 +63,36 @@ class RefData:
 
         return date
 
+    def find_first_notice_date(self, symbol, contract):
+        """
+        Returns a date string for a given instrument, if the instrument
+        doesn't exist returns None.
+        """
+        cme_instrument = CMEHelper.convert_to_cme_instrument(symbol, contract)
+
+        query = '{}/v2/instruments?globexSymbol={}'.format(self._url_query, cme_instrument)
+
+        auth_header = {'Authorization' : 'Bearer {}'.format(self._access_token)}
+
+        r = requests.get(query, headers=auth_header)
+
+        try: 
+            response = r.json()
+            date = response['_embedded']['instruments'][0]['firstNoticeDate']
+        except KeyError as e:
+            date = None
+
+        return date
+
 def main():
 
     try:
         c = ConfigClient('config_testing.ini')
         rd = RefData(c)
 
-        for i in ('BTCF23', 'BTCG23', 'BTCX22', 'BTCZ22', 'CLTQ23', 'CLTZ23'):
-            ed = rd.find_expire_date(i)
-            print('{} -> {}'.format(i, ed))
+        for c in ('F23', 'G23', 'X22', 'Z22'):
+            ed = rd.find_expire_date('BTC', c)
+            print('{} -> {}'.format(c, ed))
     except RefDataError as e:
         print(e)
 

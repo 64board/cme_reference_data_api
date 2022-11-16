@@ -12,8 +12,8 @@ from config_client import ConfigClient
 
 def main():
     """
-    Updates database prices table expiration date field for CME instruments,
-    using CME Reference Data API to obtain expiration dates.
+    Updates database prices table first notice date field for CME instruments,
+    using CME Reference Data API to obtain first notice dates.
     janeiros@mbfcc.com
     2022-11-09
     """
@@ -39,38 +39,39 @@ def main():
             print('Connecting to: {} ...'.format(c.host))
 
             sql = """
-            SELECT s.mbf_symbol, s.mdp3_symbol, p.contract, p.expires
+            SELECT s.mbf_symbol, s.mdp3_symbol, p.contract, p.fnotice
             FROM pltracker.cme_symbols AS s
             INNER JOIN pltracker.prices AS p ON s.mbf_symbol = p.symbol
-            WHERE p.expires IS NULL AND s.mdp3_symbol IS NOT NULL;
+            WHERE p.fnotice IS NULL AND s.mdp3_symbol IS NOT NULL AND s.is_option = 0
+            AND s.mbf_symbol NOT IN (SELECT symbol FROM pltracker.instruments WHERE description RLIKE ' TAS\$');
             """
 
             prices = db.query(sql)
     
             if len(prices) > 0:
-                print('Instruments with null expiration dates found.')
+                print('Instruments with null first notice dates found.')
 
-                for (symbol_mbf, mdp3_symbol, contract, expires) in prices:
-                    print('{}|{}|{} -> {}'.format(symbol_mbf, mdp3_symbol, contract, expires))
-                    instruments.append({'symbol_mbf' : symbol_mbf, 'mdp3_symbol' : mdp3_symbol, 'contract' : contract, 'expires' : expires})
+                for (symbol_mbf, mdp3_symbol, contract, first_notice) in prices:
+                    print('{}|{}|{} -> {}'.format(symbol_mbf, mdp3_symbol, contract, first_notice))
+                    instruments.append({'symbol_mbf' : symbol_mbf, 'mdp3_symbol' : mdp3_symbol, 'contract' : contract, 'first_notice' : first_notice})
             else:
-                print('All instruments have expiration dates.')
+                print('All instruments have first notice dates.')
                 sys.exit(1)
 
-            print('Updating instruments expiration dates ...')
+            print('Updating instruments first notice dates ...')
             c = ConfigClient(config_file)
             rd = RefData(c)
             
             for i in instruments:
                 print('Searching {} ...'.format(i['symbol_mbf']+i['contract']))
                 
-                date = rd.find_expire_date(i['mdp3_symbol'], i['contract'])
+                date = rd.find_first_notice_date(i['mdp3_symbol'], i['contract'])
 
                 if date != None: 
                     print('Updating {} with {} ...'.format(i['symbol_mbf']+i['contract'], date))
-                    db.execute('UPDATE prices SET expires = %s WHERE symbol = %s AND contract = %s', (date, i['symbol_mbf'], i['contract']))
+                    db.execute('UPDATE prices SET fnotice = %s WHERE symbol = %s AND contract = %s', (date, i['symbol_mbf'], i['contract']))
                 else:
-                    print('No expiration date found for {} ...'.format(i['symbol_mbf']+i['contract'], date))
+                    print('No first notice date found for {} ...'.format(i['symbol_mbf']+i['contract'], date))
 
     except (ValueError, DatabaseError, RefDataError) as e:
         print(e)
