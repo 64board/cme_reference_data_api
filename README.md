@@ -19,5 +19,22 @@ https://auth.cmegroup.com/as/token.oauth2
 
 Query URLs
 
+New Release
 http://api.refdata.nr.cmegroup.com/
+
+Production
 http://api.refdata.cmegroup.com/
+
+Authorized API ID's may access three endpoints in the New release and Production environments:
+
+New Release Endpoints:
+
+    /v2/products
+    /v2/instruments
+    /v2/displayGroups
+
+Production Endpoints:
+
+    /v2/products
+    /v2/instruments
+    /v2/displayGroups
