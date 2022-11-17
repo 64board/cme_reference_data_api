@@ -1,4 +1,6 @@
+# Ignore Python cache.
 __pycache__
-config_intranetb.ini
-config_main.ini
-config_testing.ini
+# Ignore *.ini files.
+*.ini
+# Do not ignore config.ini file.
+!config.ini
