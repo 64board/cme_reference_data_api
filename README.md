@@ -16,3 +16,8 @@ https://authnr.cmegroup.com/as/token.oauth2
 
 Production
 https://auth.cmegroup.com/as/token.oauth2
+
+Query URLs
+
+http://api.refdata.nr.cmegroup.com/
+http://api.refdata.cmegroup.com/
